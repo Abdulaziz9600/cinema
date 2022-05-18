@@ -1,18 +1,53 @@
 let elCinemaList = $(".js-cinema-list");
+let elFormSerach = $(".js-form-search");
+let elFlimSerach = $(".js-films-search");
+let elMovieTemplate = $("#movies-template").content;
 
-kinolar.forEach(function(kino) {
-  kinolar.splice(97);
+kinolar.splice(100)
 
-  let NewLi = createElement("li", " col-sm-4 col-md-3 col-lg-2 text-center p-4 mx-2 mb-2 border border-2 border-success rounded bg-light me-5 shadow p-3 mb-5 bg-secondary");
-  let NewDiv = createElement("div"," text-danger");
-  let NewH = createElement("h2","", kino.title.toUpperCase());
-  let NewSpan = createElement("span","",kino.year)
-  let NewPi = createElement("p"," text-success ",kino.cast);
-  let NewPi2 = createElement("p","",kino.genres.toString());
+let normalizedMovies = kinolar.map((kino) => {
+  return {
+    title: kino.title,
+    cast: kino.cast.join(", "),
+    genres: kino.genres.join(", "),
+    year: kino.year,
+  }
+})
 
-  elCinemaList.append(NewLi);
-  NewLi.append(NewDiv);
-  NewDiv.append(NewH,NewSpan,NewPi,NewPi2);
+let createMovieElement = (movie) => {
+  elCinemaList.innerHTML = "";
 
+  let movieElement = elMovieTemplate.cloneNode(true);
 
+  $(".card-title", movieElement).textContent = movie.title;
+  $(".card-cast", movieElement).textContent = movie.cast;
+  $(".card-genres", movieElement).textContent = movie.genres;
+  $(".card-year", movieElement).textContent = movie.year;
+
+  return movieElement;
+}
+
+let renderMovies = (movies) => {
+  let elResultFragment = document.createDocumentFragment();
+
+  movies.forEach((movie) => {
+    elResultFragment.appendChild(createMovieElement(movie));
+  })
+
+  elCinemaList.appendChild(elResultFragment);
+}
+
+renderMovies(normalizedMovies);
+
+elFormSerach.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+
+  let searchMovie = new RegExp(elFlimSerach.value.trim(), "gi");
+
+  let searchResult = normalizedMovies.filter((movie) => {
+    if (movie.title.match(searchMovie)) {
+      return movie.title.match(searchMovie);
+    }
+  })
+  renderMovies(searchResult);
 })
